@@ -12,3 +12,8 @@ add_executable(saxpy saxpy.c)
 add_executable(saxpy_cpp saxpy.cpp)
 # CUDA version
 add_executable(saxpy_cuda saxpy.cu)
+# CUBLAS version
+add_executable(saxpy_cublas saxpy_cublas.cu)
+
+# Link to CUBLAS for saxpy_cublas target
+target_link_libraries(saxpy_cublas PUBLIC cublas)

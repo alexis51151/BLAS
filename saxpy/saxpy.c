@@ -10,13 +10,19 @@
  */
 
 // Sequential saxpy function on CPU in C
-void saxpy(int n, float a, const float* x, const float* y, float* z) {
+void saxpy(int n, float a, const float* x, float* y) {
     for (int i = 0; i < n; i++) {
-        z[i] = a * x[i] + y[i];
+        y[i] = a * x[i] + y[i];
     }
 }
 
-void bench(int n_trials, void* func_saxpy(int, float, const float*, const float*, float*)) {
+void reset(int n, float* y, float val) {
+    for (int i =0; i < n; i++) {
+        y[i] = val;
+    }
+}
+
+void bench(int n_trials, void* func_saxpy(int, float, const float*, float*)) {
     // Define the example: 2 * I + 3I
     const int N = 2 << 27;
     float a = 2.0;
@@ -24,19 +30,18 @@ void bench(int n_trials, void* func_saxpy(int, float, const float*, const float*
     // Allocate the vectors
     float* x = (float*) malloc(N * sizeof(float));
     float* y = (float*) malloc(N * sizeof(float));
-    float* z = (float*) malloc(N * sizeof(float));
 
     for (int i = 0; i < N; i++) {
         x[i] = 1.0;
         y[i] = 3.0;
-        z[i] = 0.0;
     }
 
     long avg_dur = 0;
     struct timespec start, end;
     for (int i = 0; i < n_trials; i++) {
+        reset(N, y, 3.0);
         clock_gettime(CLOCK_MONOTONIC, &start);
-        func_saxpy(N, a, x, y, z);
+        func_saxpy(N, a, x, y);
         clock_gettime(CLOCK_MONOTONIC, &end);
         double dur_ms = ((end.tv_sec - start.tv_sec) * 1e9 + end.tv_nsec - start.tv_nsec) / 1e6;
         avg_dur += dur_ms;
@@ -47,8 +52,8 @@ void bench(int n_trials, void* func_saxpy(int, float, const float*, const float*
     // Check the output for the last call
     double sum = 0.0;
     for (int i = 0; i < N; i++) {
-        assert(z[i] == 5);
-        sum += z[i];
+        assert(y[i] == 5.0);
+        sum += y[i];
     }
     printf("sum = %e\n", sum);
     // remark: sum becomes incorrect when N is too large
@@ -57,7 +62,6 @@ void bench(int n_trials, void* func_saxpy(int, float, const float*, const float*
     // Free the vectors
     free(x);
     free(y);
-    free(z);
 }
 
 int main() {
