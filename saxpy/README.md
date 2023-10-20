@@ -21,5 +21,5 @@ We consider the following benchmark settings:
 
 1. **C vs C++:** the C++ and C version perform similarly.
 2. **CUDA: 128 vs 1024:** We observe that, for the CUDA variant, the number of threads per block does not impact the performance.
-3. **CUDA vs C/C++:** CUDA parallelization allows for a **x10** speedup here, which is OK but not incredible.
+3. **CUDA vs C/C++:** CUDA parallelization allows for a **x7** speedup here, which is OK but not incredible.
 4. **CUDA vs CUBLAS:** Similar performance, there may not be optimization opportunities here.
